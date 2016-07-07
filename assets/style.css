@@ -1,0 +1,16 @@
+*, *:before, *:after {
+	box-sizing: border-box;
+}
+
+h1, h2 {
+	color: #404040;
+	text-align: center;
+}
+
+h1 {
+	font-size: 3.2em;
+}
+
+h2 {
+	font-size: 1.3em;
+}
