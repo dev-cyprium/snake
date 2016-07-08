@@ -17,6 +17,7 @@ Vector2.prototype.add = function(vec2) {
 	this.y += vec2.y;
 }
 
+
 var Game = function(size) {
 	this.size = size;
 	this.grid = new Array(size);
@@ -54,6 +55,8 @@ Game.prototype.create = function() {
 		var input_referance = new Vector2(0,0);
 		if(e.which == 119 || e.which == 115 || e.which == 100 || e.which == 97) {
 			e.preventDefault();
+		} else {
+			return;
 		}
 		input_referance.y = ((e.which == 119) - (e.which == 115));
 		input_referance.x = ((e.which == 100) - (e.which == 97));
@@ -62,15 +65,22 @@ Game.prototype.create = function() {
 }
 
 Game.prototype.update = function() {
-	this.snake.position.add(this.snake.direction);
 	for(var i=0; i < this.size; i++) {
 		for(var j=0; j < this.size; j++) {
-			if(i == this.snake.position.x && j == this.snake.position.y) {
-				this.grid[i][j].state = "snake";
-			} else {
-				this.grid[i][j].state = "empty";
-			}
+			this.grid[i][j].state = "empty";
 		}
+	}
+
+	this.snake.position.add(this.snake.direction);
+	this.snake.cells.splice(-1);
+	this.snake.cells.splice(0, 0, new Vector2(this.snake.position.x, this.snake.position.y));
+
+	var out = "";
+	for(var i = 0; i < this.snake.cells.length; i++) {
+		out += "( " + this.snake.cells[i].x + ", " + this.snake.cells[i].y + " )";
+		var x = this.snake.cells[i].x;
+		var y = this.snake.cells[i].y;
+		this.grid[x][y].state = "snake";
 	}
 }
 
@@ -92,7 +102,9 @@ Game.prototype.render = function() {
 var Snake = function(x,y) {
 	this.position = new Vector2(x,y);
 	this.cells = [];
-	this.cells.push([x,y]);
+	this.cells.push(new Vector2(this.position.x, this.position.y));
+	this.cells.push(new Vector2(x+1,y));
+	this.cells.push(new Vector2(x+2,y));
 	this.direction = new Vector2(0,1);
 }
 
