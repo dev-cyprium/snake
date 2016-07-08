@@ -24,7 +24,7 @@ footer {
 }
 
 #game {
-	width: 500px;
+	width: 500px; /* 500 = 20 * 25 */
 	height: auto;
 	margin: auto;
 	margin-bottom: 20px;
@@ -40,4 +40,14 @@ footer {
 	float: left;
 	width: 25px;
 	height: 25px;
+}
+
+#game_over {
+	display: none;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: white;
+	z-index: 999;
 }

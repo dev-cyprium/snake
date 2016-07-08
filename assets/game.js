@@ -1,3 +1,5 @@
+var $score = $("#score");
+
 var Cell = function(val) {
 	/*
 		empty - empty cell
@@ -23,6 +25,9 @@ var Game = function(size) {
 	this.grid = new Array(size);
 	this.snake = new Snake(size/2, size/2);
 	this.input = new Vector2(0,0);
+	this.food = new Food(0,0);
+	this.score = 0;
+	this.game_over = false;
 	for(var i=0; i < size; i++) {
 		this.grid[i] = new Array(size);
 	}
@@ -38,6 +43,14 @@ var Game = function(size) {
 	}
 }
 
+Game.prototype.generateFood = function() {
+	do {
+		rx = Math.floor(Math.random() * this.size);
+		ry = Math.floor(Math.random() * this.size);
+	} while(this.grid[rx][ry].state != 'empty')
+	this.food = new Food(rx,ry);
+}
+
 Game.prototype.create = function() {
 	var size = this.size;
 	for(var i=0; i < size; i++) {
@@ -50,6 +63,8 @@ Game.prototype.create = function() {
 			$("#game").append($div);
 		}
 	}
+	this.generateFood();
+
 	var game_referance = this;
 	$("body").keypress(function(e) {
 		var input_referance = new Vector2(0,0);
@@ -65,6 +80,14 @@ Game.prototype.create = function() {
 }
 
 Game.prototype.update = function() {
+	var snake_x = this.snake.position.x;
+	var snake_y = this.snake.position.y;
+	if(snake_x < 0 || snake_y < 0 || snake_x > this.size || snake_y > this.size) {
+		this.game_over = true;
+		return;
+	}
+
+
 	for(var i=0; i < this.size; i++) {
 		for(var j=0; j < this.size; j++) {
 			this.grid[i][j].state = "empty";
@@ -75,12 +98,29 @@ Game.prototype.update = function() {
 	this.snake.cells.splice(-1);
 	this.snake.cells.splice(0, 0, new Vector2(this.snake.position.x, this.snake.position.y));
 
-	var out = "";
+	var snake_pos = this.snake.position;
+	var food_pos = this.food.position;
+
 	for(var i = 0; i < this.snake.cells.length; i++) {
-		out += "( " + this.snake.cells[i].x + ", " + this.snake.cells[i].y + " )";
 		var x = this.snake.cells[i].x;
 		var y = this.snake.cells[i].y;
 		this.grid[x][y].state = "snake";
+		if(i > 1) {
+			if(this.snake.cells[i].x == snake_pos.x && this.snake.cells[i].y == snake_pos.y) {
+				this.game_over = true;
+				return;
+			}
+		}
+	}
+
+
+	if(snake_pos.x == food_pos.x && snake_pos.y == food_pos.y) {
+		this.snake.cells.push(new Vector2(food_pos.x, food_pos.y));
+		this.generateFood();
+		this.score++;
+		$score.html(this.score);
+	} else {
+		this.grid[this.food.position.x][this.food.position.y].state = 'food';
 	}
 }
 
@@ -92,6 +132,9 @@ Game.prototype.render = function() {
 			switch(state) {
 				case 'snake':
 					color = "black";
+					break;
+				case 'food':
+					color = "green";
 					break;
 			}
 			$("#cell-"+i+"-"+j).css("background-color",color);
@@ -108,12 +151,34 @@ var Snake = function(x,y) {
 	this.direction = new Vector2(0,1);
 }
 
-$(document).ready(function() {
+var Food = function(x,y) {
+	this.position = new Vector2(x,y);
+}
+
+function main() {
+
+	// Game
 	var game = new Game(20);
 	game.create();
 	
 	var loop = setInterval(function() {
 		game.update();
 		game.render();
+		if(game.game_over) {
+			clearInterval(loop);
+			$("#final").html(game.score);
+			$("#game_over").slideDown(200);
+		}
 	}, 200);
+}
+
+$(document).ready(function() {
+	// Restart
+	$("#restart").click(function() {
+		$("#game_over").hide();
+		$("#game").html("");
+		$("#score").html("0");
+		main();
+	});
+	main();
 });
