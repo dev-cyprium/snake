@@ -3,7 +3,6 @@ var Cell = function(val) {
 		empty - empty cell
 		snake - snake parts
 		food - food part
-		wall - wall(collision)
 	*/
 	this.state = val;
 }
@@ -22,6 +21,7 @@ var Game = function(size) {
 	this.size = size;
 	this.grid = new Array(size);
 	this.snake = new Snake(size/2, size/2);
+	this.input = new Vector2(0,0);
 	for(var i=0; i < size; i++) {
 		this.grid[i] = new Array(size);
 	}
@@ -49,6 +49,16 @@ Game.prototype.create = function() {
 			$("#game").append($div);
 		}
 	}
+	var game_referance = this;
+	$("body").keypress(function(e) {
+		var input_referance = new Vector2(0,0);
+		if(e.which == 119 || e.which == 115 || e.which == 100 || e.which == 97) {
+			e.preventDefault();
+		}
+		input_referance.y = ((e.which == 119) - (e.which == 115));
+		input_referance.x = ((e.which == 100) - (e.which == 97));
+		game_referance.snake.direction = new Vector2(-input_referance.y, input_referance.x);
+	});
 }
 
 Game.prototype.update = function() {
@@ -93,5 +103,5 @@ $(document).ready(function() {
 	var loop = setInterval(function() {
 		game.update();
 		game.render();
-	}, 250);
+	}, 200);
 });
