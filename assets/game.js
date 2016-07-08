@@ -65,6 +65,7 @@ Game.prototype.create = function() {
 	}
 	this.generateFood();
 
+	// Game Input
 	var game_referance = this;
 	$("body").keypress(function(e) {
 		var input_referance = new Vector2(0,0);
@@ -73,9 +74,13 @@ Game.prototype.create = function() {
 		} else {
 			return;
 		}
+
+		// TODO: fix a bug in movement in reverse
 		input_referance.y = ((e.which == 119) - (e.which == 115));
 		input_referance.x = ((e.which == 100) - (e.which == 97));
+	
 		game_referance.snake.direction = new Vector2(-input_referance.y, input_referance.x);
+
 	});
 }
 

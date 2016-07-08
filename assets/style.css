@@ -43,6 +43,7 @@ footer {
 }
 
 #game_over {
+	border: 1px solid black;
 	display: none;
 	position: fixed;
 	top: 50%;
